@@ -1,0 +1,1 @@
+# stok-satis-projesi

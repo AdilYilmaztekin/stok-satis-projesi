@@ -1,0 +1,2 @@
+kendime bir renk paleti bulup admin panelini ve tüm butonları bu renk üzerinde geliştireceğim
+

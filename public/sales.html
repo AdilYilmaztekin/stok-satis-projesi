@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Satışlar | Stok + Satış Yönetim Paneli</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet" />
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="brand">
+        <i class="bi bi-box-seam"></i>
+        <span>Stok+Satış</span>
+    </div>
+
+    <nav class="nav flex-column">
+        <a href="index.html" class="nav-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+        <a href="products.html" class="nav-link"><i class="bi bi-box"></i> Ürünler</a>
+        <a href="warehouses.html" class="nav-link"><i class="bi bi-buildings"></i> Depolar</a>
+        <a href="stocks.html" class="nav-link"><i class="bi bi-diagram-3"></i> Stok Yönetimi</a>
+        <a href="caris.html" class="nav-link"><i class="bi bi-people"></i> Cariler</a>
+        <a href="sales.html" class="nav-link active"><i class="bi bi-cart-check"></i> Satışlar</a>
+    </nav>
+</div>
+
+<div class="main-content">
+
+    <div class="topbar d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h4 class="mb-1 fw-bold">Satış Yönetimi</h4>
+            <small class="text-muted">Satışları görüntüleyin ve yönetin.</small>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#saleModal">
+                <i class="bi bi-plus-circle me-2"></i>Yeni Satış
+            </button>
+
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:42px;height:42px;">
+                    A
+                </div>
+                <div>
+                    <div class="fw-semibold">Adil</div>
+                    <small class="text-muted">Admin</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card content-card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h5 class="section-title mb-0">Satış Listesi</h5>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                    <tr>
+                        <th>Tarih</th>
+                        <th>Cari</th>
+                        <th>Depo</th>
+                        <th>Toplam</th>
+                        <th>Durum</th>
+                        <th class="text-end">İşlem</th>
+                    </tr>
+                    </thead>
+                    <tbody id="salesTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Satışlar yükleniyor...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="saleModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Yeni Satış</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label>Tarih</label>
+                        <input type="date" id="saleDate" class="form-control">
+                    </div>
+
+                    <div class="col">
+                        <label>Cari</label>
+                        <select id="cariSelect" class="form-select"></select>
+                    </div>
+
+                    <div class="col">
+                        <label>Depo</label>
+                        <select id="warehouseSelect" class="form-select" onchange="handleWarehouseChange()"></select>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 d-flex justify-content-between align-items-center py-2 mb-3 shadow-sm">
+                    <span class="fw-medium"><i class="bi bi-info-circle me-2"></i>Satış yapılacak ürünleri ekleyin.</span>
+                    <span id="warehouseProductCount" class="badge bg-primary rounded-pill px-3">Ürün Sayısı: 0</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                        <tr>
+                            <th style="width:35%">Ürün</th>
+                            <th style="width:10%">Stok</th>
+                            <th style="width:15%">Adet</th>
+                            <th style="width:15%">Birim Fiyat</th>
+                            <th style="width:20%">Toplam</th>
+                            <th style="width:5%"></th>
+                        </tr>
+                        </thead>
+                        <tbody id="saleItemsBody"></tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-outline-primary btn-sm mb-3" onclick="addSaleRow()">
+                    <i class="bi bi-plus-lg me-1"></i> Ürün Ekle
+                </button>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-8">
+                        <label>Açıklama</label>
+                        <textarea id="description" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="col-4 text-end">
+                        <label class="fw-bold">Genel Toplam</label>
+                        <div class="input-group">
+                            <input type="number" id="totalAmount" class="form-control form-control-lg fw-bold" disabled placeholder="0.00">
+                            <span class="input-group-text">₺</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0">
+                <button class="btn btn-light rounded-pill px-4" onclick="clearSaleForm()">Temizle</button>
+                <button class="btn btn-success rounded-pill px-4" onclick="saveSale()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="saleConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="confirmTitle">Onay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-0" id="confirmText"></p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">İptal</button>
+                <button class="btn btn-danger rounded-pill px-4" id="confirmOkBtn">Evet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./js/common.js"></script>
+<script src="./js/sales.js"></script>
+
+</body>
+</html>
