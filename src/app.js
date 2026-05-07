@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 // 2. Statik dosyaları sunma (public klasörünü dışarı açar)
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "../public")));
 
 // routes
 app.use("/api/products", productRoutes);
@@ -26,7 +26,7 @@ app.use("/api/sales", salesRoutes);
 
 // 3. Ana sayfada caris.html veya index.html'i otomatik açmak için:
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "../public", "index.html"));
 });
 
 // 4. Port ayarını canlı ortam değişkenine (environment variable) uyumlu yaptık
