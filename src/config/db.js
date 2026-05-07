@@ -9,20 +9,20 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  // Railway ve Render arasındaki mesafe için bu 3 satır ÇOK önemli:
-  connectTimeout: 20000, 
-  acquireTimeout: 20000,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 10000
+  connectTimeout: 20000,
+  // KRİTİK AYAR: Railway bağlantısı için SSL şart olabilir
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-// Bağlantıyı test eden bir blok (Loglarda görmek için)
-pool.getConnection((err, connection) => {
+// Test bağlantısı
+pool.getConnection((err, conn) => {
   if (err) {
-    console.error('MySQL bağlantı hatası:', err.message);
+    console.error('MySQL bağlantı hatası detayı:', err);
   } else {
-    console.log('MySQL Canlı Veritabanına Başarıyla Bağlandı! ✅');
-    connection.release();
+    console.log('MySQL bağlantısı nihayet BAŞARILI! 🚀');
+    conn.release();
   }
 });
 
