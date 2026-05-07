@@ -1,5 +1,5 @@
 // API adresi
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = "/api";
 
 // DOM elementleri
 const productsTableBody = document.getElementById("productsTableBody");
