@@ -12,7 +12,10 @@ const editCariForm = document.getElementById("editCariForm");
 document.getElementById("openAddCariModalBtn")
 .addEventListener("click", () => addCariModal.show());
 
-
+document.addEventListener("DOMContentLoaded", () => {
+    showToast("Cari sayfası yüklendi (TEST)", "info");
+    loadCaris();
+});
 // =====================
 // LIST
 // =====================
