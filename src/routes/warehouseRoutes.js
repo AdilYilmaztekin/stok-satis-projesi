@@ -2,67 +2,68 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
-// Depo ekleme
-router.post("/add", (req, res) => {
+// =====================
+// DEPO EKLEME (POST)
+// =====================
+router.post("/add", async (req, res) => {
     const { name, location } = req.body;
-
-    const sql = "INSERT INTO warehouses (name, location) VALUES (?, ?)";
-
-    db.query(sql, [name, location], (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("Depo eklenirken hata oluştu");
-        }
-
-        res.send("Depo eklendi ");
-    });
+    try {
+        const sql = "INSERT INTO `warehouses` (`name`, `location`, `active`) VALUES (?, ?, 0)";
+        await db.query(sql, [name, location]);
+        res.send("Depo eklendi");
+    } catch (err) {
+        console.error("Depo Ekleme Hatası:", err);
+        res.status(500).send("Depo eklenirken hata oluştu");
+    }
 });
 
-// Aktif depoları listeleme
-router.get("/", (req, res) => {
-    const sql = "SELECT * FROM warehouses WHERE active = 0 ORDER BY id DESC";
-
-    db.query(sql, (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("Depolar listelenirken hata oluştu");
-        }
-
-        res.json(result);
-    });
+// =====================
+// AKTİF DEPOLARI LİSTELEME (GET)
+// =====================
+router.get("/", async (req, res) => {
+    try {
+        const sql = "SELECT * FROM `warehouses` WHERE `active` = 0 ORDER BY `id` DESC";
+        const [rows] = await db.query(sql);
+        res.json(rows);
+    } catch (err) {
+        console.error("Depo Listeleme Hatası:", err);
+        res.status(500).send("Depolar listelenirken hata oluştu");
+    }
 });
 
-// Depo güncelleme
-router.put("/update/:id", (req, res) => {
+// =====================
+// DEPO GÜNCELLEME (PUT)
+// =====================
+router.put("/update/:id", async (req, res) => {
     const { id } = req.params;
     const { name, location } = req.body;
-
-    const sql = "UPDATE warehouses SET name = ?, location = ? WHERE id = ?";
-
-    db.query(sql, [name, location, id], (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("Depo güncellenirken hata oluştu");
-        }
-
-        res.send("Depo güncellendi ");
-    });
+    try {
+        const sql = "UPDATE `warehouses` SET `name` = ?, `location` = ? WHERE `id` = ? AND `active` = 0";
+        await db.query(sql, [name, location, id]);
+        res.send("Depo güncellendi");
+    } catch (err) {
+        console.error("Depo Güncelleme Hatası:", err);
+        res.status(500).send("Depo güncellenirken hata oluştu");
+    }
 });
 
-// Depo silme (soft delete)
-router.delete("/delete/:id", (req, res) => {
+// =====================
+// DEPO SİLME (SOFT DELETE)
+// =====================
+router.delete("/delete/:id", async (req, res) => {
     const { id } = req.params;
-
-    const sql = "UPDATE warehouses SET active = 1 WHERE id = ?";
-
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("Depo silinirken hata oluştu");
+    try {
+        const sql = "UPDATE `warehouses` SET `active` = 1 WHERE `id` = ?";
+        const [result] = await db.query(sql, [id]);
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).send("Depo bulunamadı");
         }
-
-        res.send("Depo silindi. ");
-    });
+        res.send("Depo silindi.");
+    } catch (err) {
+        console.error("Depo Silme Hatası:", err);
+        res.status(500).send("Depo silinirken hata oluştu");
+    }
 });
 
 module.exports = router;

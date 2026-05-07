@@ -37,7 +37,8 @@ async function loadWarehousesAndProducts() {
 
 async function loadWarehouses() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/warehouses`);
+        // BURADA /api/api hatasını düzelttik:
+        const response = await fetch(`${API_BASE_URL}/warehouses`);
 
         if (!response.ok) {
             throw new Error(`HTTP hata: ${response.status}`);
@@ -50,7 +51,6 @@ async function loadWarehouses() {
 
         data.forEach((warehouse) => {
             const warehouseName = warehouse.name || warehouse.warehouse_name;
-
             warehouseSelect.innerHTML += `<option value="${warehouse.id}">${warehouseName}</option>`;
             editWarehouseSelect.innerHTML += `<option value="${warehouse.id}">${warehouseName}</option>`;
         });
@@ -62,7 +62,8 @@ async function loadWarehouses() {
 
 async function loadProducts() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/products`);
+        // BURADA /api/api hatasını düzelttik:
+        const response = await fetch(`${API_BASE_URL}/products`);
 
         if (!response.ok) {
             throw new Error(`HTTP hata: ${response.status}`);
@@ -75,7 +76,6 @@ async function loadProducts() {
 
         data.forEach((product) => {
             const productName = product.name || product.product_name;
-
             productSelect.innerHTML += `<option value="${product.id}">${productName}</option>`;
             editProductSelect.innerHTML += `<option value="${product.id}">${productName}</option>`;
         });
@@ -87,7 +87,8 @@ async function loadProducts() {
 
 async function loadStocks() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/stocks`);
+        // BURADA /api/api hatasını düzelttik:
+        const response = await fetch(`${API_BASE_URL}/stocks`);
 
         if (!response.ok) {
             throw new Error(`HTTP hata: ${response.status}`);
@@ -120,16 +121,12 @@ async function loadStocks() {
                     <td class="text-end">
                         <button 
                             class="btn btn-sm btn-outline-primary rounded-pill me-2"
-                            data-bs-toggle="tooltip"
-                            data-bs-title="Düzenle"
                             onclick="editStock(${stock.id})">
                             <i class="bi bi-pencil"></i>
                         </button>
 
                         <button 
                             class="btn btn-sm btn-outline-danger rounded-pill"
-                            data-bs-toggle="tooltip"
-                            data-bs-title="Sil"
                             onclick="deleteStock(${stock.id})">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -159,13 +156,9 @@ addStockForm.addEventListener("submit", async (e) => {
         stock: stockAmount.value
     };
 
-    if (!payload.warehouse_id || !payload.product_id || !payload.stock) {
-        showToast("Lütfen tüm alanları doldurun.", "warning");
-        return;
-    }
-
     try {
-        const response = await fetch(`${API_BASE_URL}/api/stocks/add`, {
+        // BURADA /api/api hatasını düzelttik:
+        const response = await fetch(`${API_BASE_URL}/stocks/add`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -186,15 +179,14 @@ addStockForm.addEventListener("submit", async (e) => {
         showToast(result.message || "Stok kaydı eklendi.", "success");
     } catch (error) {
         console.error("Stok ekleme hatası:", error);
-        showToast("Stok eklenirken bir hata oluştu.", "error");
     }
 });
 
 async function editStock(id) {
     try {
         await loadWarehousesAndProducts();
-
-        const response = await fetch(`${API_BASE_URL}/api/stocks/${id}`);
+        // BURADA /api/api hatasını düzelttik:
+        const response = await fetch(`${API_BASE_URL}/stocks/${id}`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -210,37 +202,27 @@ async function editStock(id) {
         editStockModal.show();
     } catch (error) {
         console.error("Stok bilgisi alınamadı:", error);
-        showToast("Stok bilgisi alınırken bir hata oluştu.", "error");
     }
 }
 
 editStockForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     const id = editStockId.value;
-
     const payload = {
         warehouse_id: editWarehouseSelect.value,
         product_id: editProductSelect.value,
         stock: editStockAmount.value
     };
 
-    if (!payload.warehouse_id || !payload.product_id || !payload.stock) {
-        showToast("Lütfen tüm alanları doldurun.", "warning");
-        return;
-    }
-
     try {
-        const response = await fetch(`${API_BASE_URL}/api/stocks/update/${id}`, {
+        // BURADA /api/api hatasını düzelttik:
+        const response = await fetch(`${API_BASE_URL}/stocks/update/${id}`, {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
 
         const result = await response.json();
-
         if (!response.ok) {
             showToast(result.message || "Stok güncellenemedi.", "error");
             return;
@@ -251,7 +233,6 @@ editStockForm.addEventListener("submit", async (e) => {
         showToast(result.message || "Stok kaydı güncellendi.", "success");
     } catch (error) {
         console.error("Stok güncelleme hatası:", error);
-        showToast("Stok güncellenirken bir hata oluştu.", "error");
     }
 });
 
@@ -261,12 +242,12 @@ function deleteStock(id) {
         "Bu stok kaydını silmek istediğinize emin misiniz?",
         async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/stocks/delete/${id}`, {
+                // BURADA /api/api hatasını düzelttik:
+                const response = await fetch(`${API_BASE_URL}/stocks/delete/${id}`, {
                     method: "PUT"
                 });
 
                 const result = await response.json();
-
                 if (!response.ok) {
                     showToast(result.message || "Stok kaydı silinemedi.", "error");
                     return;
@@ -276,15 +257,11 @@ function deleteStock(id) {
                 showToast(result.message || "Stok kaydı silindi.", "success");
             } catch (error) {
                 console.error("Stok silme hatası:", error);
-                showToast("Stok silinirken bir hata oluştu.", "error");
             }
         }
     );
 }
 
-// =====================
-// TOOLTIP AKTİF ETME
-// =====================
 function initTooltips() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     tooltipTriggerList.forEach(tooltipTriggerEl => {
