@@ -13,7 +13,7 @@ body {
 .sidebar {
     width: 260px;
     min-height: 100vh;
-    background: linear-gradient(110deg, #0f172a, #0e4181);
+    background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
     color: white;
     position: fixed;
     top: 0;
@@ -308,4 +308,45 @@ body {
     .main-content {
         margin-left: 0;
     }
+
+    /* saleModal'daki tüm input, select ve button'ları tek sütun yapaan css */
+    #saleModal .row:first-of-type > div,
+    #saleModal .row:last-of-type > div,
+    #saleModal .input-group,
+    .modal-footer button {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    #saleModal .row:first-of-type > div,
+    #saleModal .row:last-of-type > div {
+        margin-bottom: 15px;
+    }
+
+    #saleItemsBody input, 
+    #saleItemsBody select {
+        min-width: 130px !important;
+        padding: 8px !important;
+    }
+
+    #saleModal .row:last-of-type {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #saleModal .row:last-of-type > div {
+        text-align: left !important;
+    }
+
+    .modal-footer {
+        display: flex !important;
+        flex-direction: column-reverse !important;
+        gap: 10px;
+    }
+
+    .modal-footer button {
+        margin: 0 !important;
+    }
+
 }

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StokBurada - Giriş</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Temel Ayarlar */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        body { 
+            background: radial-gradient(circle at top right, #e0f2fe, #f8fafc); 
+            display: flex; align-items: center; justify-content: center; 
+            min-height: 100vh; padding: 20px; 
+        }
+        
+        /* Ana Konteynır */
+        .container { 
+            max-width: 950px; width: 100%; background: white; border-radius: 32px; 
+            display: flex; overflow: hidden; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Sol Taraf (Form) */
+        .login-side { flex: 1.1; padding: 60px; display: flex; flex-direction: column; justify-content: center; }
+        .login-side h2 { font-size: 32px; color: #1e293b; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 10px; }
+        .login-side p.subtitle { color: #64748b; margin-bottom: 40px; font-size: 15px; }
+
+        .input-group { margin-bottom: 24px; position: relative; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i.main-icon { position: absolute; left: 16px; color: #94a3b8; font-size: 18px; }
+        
+        .input-wrapper input { 
+            width: 100%; padding: 14px 45px 14px 48px; border: 1.5px solid #e2e8f0; 
+            border-radius: 16px; outline: none; transition: all 0.2s ease; 
+            font-size: 15px; color: #1e293b; background: #f8fafc;
+        }
+        .input-wrapper input:focus { 
+            background: #fff; border-color: #2563eb; 
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); 
+        }
+
+        /* Şifre Gözü */
+        .toggle-password { position: absolute; right: 16px; cursor: pointer; color: #64748b; transition: 0.2s; }
+        .toggle-password:hover { color: #2563eb; }
+
+        .btn-login { 
+            width: 100%; padding: 16px; border: none; border-radius: 16px; 
+            background: linear-gradient(135deg, #1d4ed8 0%, #059669 100%);
+            color: white; font-weight: 700; font-size: 16px; cursor: pointer; 
+            transition: transform 0.2s, opacity 0.2s; margin-top: 10px;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.25);
+        }
+        .btn-login:hover { transform: translateY(-1px); opacity: 0.95; }
+
+        .create-account { text-align: center; margin-top: 30px; font-size: 14px; color: #64748b; }
+        .create-account button { background: none; border: none; color: #2563eb; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .create-account button:hover { color: #1d4ed8; text-decoration: underline; }
+
+        /* Sağ Taraf (Marka) */
+        .brand-side { 
+            flex: 0.9; background: linear-gradient(135deg, #1728eb 0%, #06a395 100%);
+            padding: 50px; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; text-align: center; color: white; position: relative;
+        }
+        .brand-side::before {
+            content: ""; position: absolute; inset: 0; opacity: 0.1;
+            background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+        }
+
+        .logo-box {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.8); 
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); 
+            padding: 18px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)); 
+        }
+
+        .brand-side h3 { font-size: 26px; font-weight: 700; margin-bottom: 16px; position: relative; letter-spacing: -0.5px; z-index: 2; }
+        .brand-side p { font-size: 16px; opacity: 0.85; line-height: 1.6; position: relative; padding: 0 20px; z-index: 2; }
+
+        /* --- MODAL TASARIMI --- */
+        .modal { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(8px); display: none; align-items: center; 
+            justify-content: center; z-index: 100; padding: 20px;
+        }
+        .modal-content { 
+            background: white; padding: 40px; border-radius: 28px; max-width: 450px; 
+            width: 100%; text-align: center; position: relative;
+            animation: modalFade 0.3s ease-out;
+        }
+        @keyframes modalFade { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal-icon {
+            width: 70px; height: 70px; background: #eff6ff; color: #3b82f6;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 30px; margin: 0 auto 20px;
+        }
+        .modal-content h3 { font-size: 22px; color: #1e293b; margin-bottom: 12px; font-weight: 800; }
+        .modal-content p { color: #64748b; font-size: 15px; line-height: 1.6; margin-bottom: 25px; }
+        
+        .mail-link { 
+            display: inline-block; background: #f1f5f9; padding: 14px 24px; border-radius: 14px; 
+            margin-bottom: 25px; color: #2563eb; font-weight: 700; font-size: 15px;
+            text-decoration: none; border: 1px solid #e2e8f0; transition: 0.2s;
+        }
+        .mail-link:hover { background: #e2e8f0; }
+
+        .btn-close { 
+            width: 100%; padding: 14px; background: #1e293b; color: white; border: none; 
+            border-radius: 14px; cursor: pointer; font-weight: 600; transition: 0.2s;
+        }
+        .btn-close:hover { background: #0f172a; }
+.login-message {
+    display: none;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.login-message.show {
+    display: block;
+}
+
+.login-message.error {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.login-message.success {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+        /* Mobil */
+        @media (max-width: 850px) {
+            .container { flex-direction: column; border-radius: 20px; }
+            .brand-side { display: none; }
+            .login-side { padding: 40px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="login-side">
+            <h2>Hoş Geldiniz</h2>
+            <p class="subtitle">StokBurada paneline erişmek için bilgilerinizi girin.</p>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label>Kullanıcı Adı</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user main-icon"></i>
+                        <input type="text" id="usernameInput" required spellcheck="false">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Şifre</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock main-icon"></i>
+                        <input type="password" id="passwordInput" required>
+                        <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>
+                    </div>
+                </div>
+                <div id="loginMessage" class="login-message"></div>
+                <button type="submit" class="btn-login">Giriş Yap</button>
+            </form>
+
+            <div class="create-account">
+                Henüz bir hesabınız yok mu? <button onclick="openModal()">Hesap isteyin</button>
+            </div>
+        </div>
+
+        <div class="brand-side">
+            <div class="logo-box">
+                <img src="img/favs.png" alt="StokBurada Logo">
+            </div>
+            <h3>StokBurada ile stoklarınızı takipte tutun</h3>
+            <p>Verilerinizi akıllıca yönetin, zaman kazanın ve işletmenizin büyümesini izleyin.</p>
+        </div>
+    </div>
+
+    <div id="modal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-icon">
+                <i class="fas fa-envelope-open-text"></i>
+            </div>
+            <h3>Yeni Hesap Talebi</h3>
+            <p>StokBurada ailesine katılmak ve size özel işletme panelinizi oluşturmak için ekibimizle iletişime geçebilirsiniz.</p>
+            <a href="mailto:adilyilmaztekinn@gmail.com" class="mail-link">adilyilmaztekinn@gmail.com</a>
+            <button class="btn-close" onclick="closeModal()">Anladım</button>
+        </div>
+    </div>
+
+    <script src="/js/login.js"></script> 
+
+
+    <script>
+        // Şifre Göster/Gizle Fonksiyonu
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const icon = document.querySelector('.toggle-password');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Modal Fonksiyonları
+        function openModal() {
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>
