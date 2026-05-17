@@ -512,3 +512,4 @@ body {
     .topbar .dropdown .dropdown-item.text-danger:focus {
         background-color: rgba(254, 202, 202, 0.35);
         color: #b91c1c;
+    }
