@@ -14,6 +14,17 @@ router.get("/", async (req, res) => {
     }
 });
 
+router.get("/count", async (req, res) => {
+    try {
+        const sql = "SELECT COUNT(*) AS total FROM `caris` WHERE `active` = 0";
+        const [rows] = await db.query(sql);
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Cari sayısı alınırken hata:", err);
+        res.status(500).json({ message: "Hata oluştu", error: err.message });
+    }
+});
+
 // ADD - Yeni cari ekle
 router.post("/add", async (req, res) => {
     const { type, name, phone, email, address, description } = req.body;

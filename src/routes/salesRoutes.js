@@ -3,11 +3,13 @@ const router = express.Router();
 const db = require("../config/db");
 
 // =====================
-// SATIŞLARI LİSTELEME (GET)
+// SATIŞLARI LİSTELEME (GET) - Filtreleme destekli
 // =====================
 router.get("/", async (req, res) => {
     try {
-        const sql = `
+        const { warehouse_id, cari_id } = req.query;
+        
+        let sql = `
             SELECT 
                 s.id, s.sale_date, s.total_amount, s.active,
                 c.name AS cari_name, w.name AS warehouse_name
@@ -15,9 +17,38 @@ router.get("/", async (req, res) => {
             LEFT JOIN \`caris\` c ON s.cari_id = c.id
             LEFT JOIN \`warehouses\` w ON s.warehouse_id = w.id
             WHERE s.active = 0
-            ORDER BY s.id DESC
         `;
-        const [rows] = await db.query(sql);
+        
+        const params = [];
+        
+        if (warehouse_id) {
+            sql += " AND s.warehouse_id = ?";
+            params.push(warehouse_id);
+        }
+        
+        if (cari_id) {
+            sql += " AND s.cari_id = ?";
+            params.push(cari_id);
+        }
+        
+        sql += " ORDER BY s.id DESC";
+        
+        const [rows] = await db.query(sql, params);
+        
+        // Her satış için detaylarını al
+        for (let sale of rows) {
+            const [items] = await db.query(`
+                SELECT 
+                    si.*, 
+                    p.name AS product_name, 
+                    p.price AS cost_price
+                FROM \`sale_items\` si
+                LEFT JOIN \`products\` p ON si.product_id = p.id
+                WHERE si.sale_id = ?
+            `, [sale.id]);
+            sale.items = items;
+        }
+        
         res.json(rows);
     } catch (err) {
         console.error("Satış listeleme hatası:", err);
@@ -25,8 +56,19 @@ router.get("/", async (req, res) => {
     }
 });
 
+router.get("/today", async (req, res) => {
+    try {
+        const sql = "SELECT IFNULL(SUM(total_amount), 0) AS total_sales, COUNT(*) AS sale_count FROM `sales` WHERE active = 0 AND DATE(sale_date) = CURDATE()";
+        const [rows] = await db.query(sql);
+        res.json(rows[0] || { total_sales: 0, sale_count: 0 });
+    } catch (err) {
+        console.error("Bugünkü satışlar alınırken hata:", err);
+        res.status(500).json({ message: "Hata oluştu", error: err.message });
+    }
+});
+
 // =====================
-// TEKİL SATIŞ DETAYI (GET)
+// TEKİL SATIŞ DETAYI (GET) - Ürün bilgileri ile
 // =====================
 router.get("/:id", async (req, res) => {
     try {
@@ -35,7 +77,15 @@ router.get("/:id", async (req, res) => {
         
         if (saleResult.length === 0) return res.status(404).json({ message: "Satış bulunamadı" });
 
-        const [itemsResult] = await db.query("SELECT * FROM `sale_items` WHERE `sale_id` = ?", [saleId]);
+        const [itemsResult] = await db.query(`
+            SELECT 
+                si.*, 
+                p.name AS product_name, 
+                p.price AS cost_price
+            FROM \`sale_items\` si
+            LEFT JOIN \`products\` p ON si.product_id = p.id
+            WHERE si.sale_id = ?
+        `, [saleId]);
         
         res.json({
             ...saleResult[0],
@@ -72,7 +122,28 @@ router.post("/", async (req, res) => {
             }
         }
 
-        res.json({ success: true, message: "Satış başarıyla eklendi" });
+        // Eklenen satışın detaylarını döndür
+        const [saleData] = await db.query(`
+            SELECT 
+                s.id, s.sale_date, s.total_amount, s.active,
+                c.name AS cari_name, w.name AS warehouse_name
+            FROM \`sales\` s
+            LEFT JOIN \`caris\` c ON s.cari_id = c.id
+            LEFT JOIN \`warehouses\` w ON s.warehouse_id = w.id
+            WHERE s.id = ?
+        `, [saleId]);
+
+        const [itemsData] = await db.query(`
+            SELECT 
+                si.*, 
+                p.name AS product_name, 
+                p.price AS cost_price
+            FROM \`sale_items\` si
+            LEFT JOIN \`products\` p ON si.product_id = p.id
+            WHERE si.sale_id = ?
+        `, [saleId]);
+
+        res.json({ success: true, message: "Satış başarıyla eklendi", sale: { ...saleData[0], items: itemsData } });
     } catch (err) {
         console.error("Satış ekleme hatası:", err);
         res.status(500).json({ message: "Hata oluştu", error: err.message });

@@ -28,6 +28,18 @@ router.get("/", async (req, res) => {
     }
 });
 
+router.get("/critical", async (req, res) => {
+    try {
+        const threshold = Number(req.query.threshold) || 5;
+        const sql = "SELECT COUNT(*) AS total FROM `product_stocks` WHERE `active` = 0 AND `stock` <= ?";
+        const [rows] = await db.query(sql, [threshold]);
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Kritik stok sayısı alınırken hata:", err);
+        res.status(500).json({ message: "Kritik stok sayısı alınırken hata oluştu." });
+    }
+});
+
 // =====================
 // STOK EKLEME (POST)
 // =====================

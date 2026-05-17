@@ -90,7 +90,7 @@ router.get("/warehouse/:id", async (req, res) => {
             SELECT 
                 p.id AS product_id,
                 p.name,
-                ps.stock
+                p.price AS cost_price,                p.created_at,                ps.stock
             FROM \`product_stocks\` ps
             INNER JOIN \`products\` p ON p.id = ps.product_id
             WHERE ps.warehouse_id = ? AND p.active = 0

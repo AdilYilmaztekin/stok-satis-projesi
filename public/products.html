@@ -11,23 +11,7 @@
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="brand">
-            <i class="bi bi-box-seam"></i>
-            <span>Stok+Satış</span>
-        </div>
-
-        <nav class="nav flex-column">
-            <a href="index.html" class="nav-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
-            <a href="products.html" class="nav-link active"><i class="bi bi-box"></i> Ürünler</a>
-            <a href="warehouses.html" class="nav-link"><i class="bi bi-buildings"></i> Depolar</a>
-            <a href="stocks.html" class="nav-link"><i class="bi bi-diagram-3"></i> Stok Yönetimi</a>
-            <a href="caris.html" class="nav-link "><i class="bi bi-people"></i> Cariler</a>
-            <a href="#" class="nav-link"><i class="bi bi-cart-check"></i> Satışlar</a>
-            <a href="#" class="nav-link"><i class="bi bi-bar-chart-line"></i> Raporlar</a>
-            <a href="#" class="nav-link"><i class="bi bi-gear"></i> Ayarlar</a>
-        </nav>
-    </div>
+    <div class="sidebar"></div>
 
     <div class="main-content">
         <div class="topbar d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -41,14 +25,15 @@
                     <i class="bi bi-plus-circle me-2"></i>Yeni Ürün Ekle
                 </button>
 
-                <div class="d-flex align-items-center gap-2">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:42px;height:42px;">
-                        A
-                    </div>
-                    <div>
-                        <div class="fw-semibold">Adil</div>
-                        <small class="text-muted">Admin</small>
-                    </div>
+                <div class="dropdown">
+                    <button class="btn btn-light border rounded-pill d-flex align-items-center gap-2" type="button" id="userDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center logged-user-initial" style="width:42px;height:42px;"></div>
+                        <span class="fw-semibold logged-user-name"></span>
+                        <i class="bi bi-chevron-down small text-muted"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="userDropdownBtn">
+                        <li><button class="dropdown-item d-flex align-items-center gap-2 text-danger" id="logoutBtn"><i class="bi bi-box-arrow-right"></i>Çıkış Yap</button></li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -59,18 +44,18 @@
                     <h5 class="section-title mb-0">Ürün Listesi</h5>
 
                     <div class="d-flex gap-2">
-                        <input type="text" class="form-control" placeholder="Ürün ara..." style="max-width: 220px;">
-                        <button class="btn btn-outline-primary rounded-pill">Ara</button>
+                        <input type="text" class="form-control table-search-input" data-table-body-id="productsTableBody" placeholder="Ürün ara..." style="max-width: 220px;">
+                        <button class="btn btn-outline-primary rounded-pill table-search-btn" data-table-body-id="productsTableBody">Ara</button>
                     </div>
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table align-middle">
+                    <table class="table align-middle sortable-table">
                         <thead>
                             <tr>
-                                <th>Ürün Adı</th>
-                                <th>Fiyat</th>
-                                <th>Durum</th>
+                                <th data-sortable="true" data-sort-type="string">Ürün Adı</th>
+                                <th data-sortable="true" data-sort-type="number">Fiyat</th>
+                                <th data-sortable="true" data-sort-type="string">Durum</th>
                                 <th class="text-end">İşlem</th>
                             </tr>
                         </thead>
@@ -195,7 +180,7 @@
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./js/products.js"></script>
     <script src="./js/common.js"></script>
+    <script src="./js/products.js"></script>
 </body>
 </html>

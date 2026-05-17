@@ -1,5 +1,13 @@
 const API_BASE_URL = window.location.origin + "/api";
 
+// Fiyat formatı (Türkçe: binler ayırıcı=nokta, ondalık=virgül)
+function formatPrice(value) {
+    return parseFloat(value || 0).toLocaleString('tr-TR', { 
+        minimumFractionDigits: 0, 
+        maximumFractionDigits: 2 
+    });
+}
+
 const salesTableBody = document.getElementById("salesTableBody");
 const saleItemsBody = document.getElementById("saleItemsBody");
 const warehouseSelect = document.getElementById("warehouseSelect");
@@ -81,7 +89,7 @@ function addSaleRow(data = null) {
             <select class="form-select productSelect">
                 <option value="">Seçiniz</option>
                 ${currentWarehouseProducts.map(p => `
-                    <option value="${p.product_id}" data-stock="${p.stock}">
+                    <option value="${p.product_id}" data-stock="${p.stock}" data-cost-price="${p.cost_price || 0}">
                         ${p.name}
                     </option>
                 `).join("")}
@@ -89,6 +97,7 @@ function addSaleRow(data = null) {
         </td>
         <td><span class="badge bg-success stockBadge">0</span></td>
         <td><input type="number" class="form-control qty" min="1" placeholder="Adet"></td>
+        <td><input type="number" class="form-control costPrice" step="0.01" placeholder="0.00" readonly></td>
         <td><input type="number" class="form-control unitPrice" step="0.01" placeholder="0.00"></td>
         <td><input type="number" class="form-control rowTotal" step="0.01" placeholder="0.00"></td>
         <td class="text-end"><button class="btn btn-outline-danger btn-sm border-0" onclick="removeRow(this)"><i class="bi bi-trash"></i></button></td>
@@ -104,11 +113,16 @@ function addSaleRow(data = null) {
         
         // Mevcut stoğa, daha önce satılmış olan miktarı ekliyoruz ki düzenlerken limit aşımı hatası vermesin.
         const option = selectEl.querySelector(`option[value="${data.product_id}"]`);
+        
         if (option) {
             const currentDbStock = parseInt(option.dataset.stock || 0);
             const realStock = currentDbStock + parseInt(data.quantity);
             option.dataset.stock = realStock; // Dom'daki limiti güncelle
             row.querySelector(".stockBadge").innerText = realStock;
+            
+            // HATA BURADAYDI: option tanımlanmadan formatPrice kullanılmıştı. 
+            // Doğru şekilde costPrice input'una değer olarak atandı.
+            row.querySelector(".costPrice").value = formatPrice(option.dataset.costPrice || 0);
         }
 
         row.querySelector(".qty").value = data.quantity;
@@ -120,6 +134,7 @@ function addSaleRow(data = null) {
 function attachRowEvents(row) {
     const product = row.querySelector(".productSelect");
     const qty = row.querySelector(".qty");
+    const costPrice = row.querySelector(".costPrice");
     const unit = row.querySelector(".unitPrice");
     const total = row.querySelector(".rowTotal");
     const stockBadge = row.querySelector(".stockBadge");
@@ -127,6 +142,7 @@ function attachRowEvents(row) {
     product.addEventListener("change", () => {
         const selected = product.options[product.selectedIndex];
         stockBadge.innerText = selected ? (selected.dataset.stock || 0) : 0;
+        costPrice.value = selected ? formatPrice(selected.dataset.costPrice || 0) : "0,00";
     });
 
     qty.addEventListener("input", () => {
@@ -192,7 +208,7 @@ async function loadSales() {
             <td class="fw-semibold text-primary">${s.total_amount} ₺</td>
             <td>${s.active == 0 ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Silinmiş</span>'}</td>
             <td class="text-end">
-                <button class="btn btn-sm btn-outline-primary rounded-pill me-2" onclick="openEditSale(${s.id})">
+                <button class="btn btn-sm btn-outline-primary rounded-pill me-2" title="Düzenle" onclick="openEditSale(${s.id})">
                     <i class="bi bi-pencil"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="openDeleteSale(${s.id})">

@@ -31,6 +31,17 @@ router.get("/", async (req, res) => {
     }
 });
 
+router.get("/count", async (req, res) => {
+    try {
+        const sql = "SELECT COUNT(*) AS total FROM `warehouses` WHERE `active` = 0";
+        const [rows] = await db.query(sql);
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Depo sayısı alınırken hata:", err);
+        res.status(500).json({ message: "Depo sayısı alınırken hata oluştu" });
+    }
+});
+
 // =====================
 // DEPO GÜNCELLEME (PUT)
 // =====================

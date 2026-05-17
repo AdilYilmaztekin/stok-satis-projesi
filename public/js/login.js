@@ -19,6 +19,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
         messageBox.className = "login-message show";
 
         if (data.success) {
+            localStorage.setItem("loggedInUser", username);
             messageBox.classList.add("success");
             messageBox.textContent = "Başarılı giriş yapılıyor...";
 

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Raporlar | Stok + Satış Yönetim Paneli</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="sidebar"></div>
+
+    <div class="main-content">
+        <div class="topbar d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h4 class="mb-1 fw-bold">Raporlar</h4>
+                <small class="text-muted">Depo, satış ve ürün raporlarını görüntüleyin.</small>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="dropdown">
+                    <button class="btn btn-light border rounded-pill d-flex align-items-center gap-2" type="button" id="userDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center logged-user-initial" style="width:42px;height:42px;"></div>
+                        <span class="fw-semibold logged-user-name"></span>
+                        <i class="bi bi-chevron-down small text-muted"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="userDropdownBtn">
+                        <li><button class="dropdown-item d-flex align-items-center gap-2 text-danger" id="logoutBtn"><i class="bi bi-box-arrow-right"></i>Çıkış Yap</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rapor Seçim Butonları -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <button class="btn btn-primary w-100 py-3 rounded-3" onclick="showWarehouseReport()">
+                    <i class="bi bi-buildings me-2" style="font-size: 1.5rem;"></i>
+                    <div class="fw-bold">Depo Raporu</div>
+                    <small>Depodaki ürünleri göster</small>
+                </button>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-success w-100 py-3 rounded-3" onclick="showSalesReport()">
+                    <i class="bi bi-receipt me-2" style="font-size: 1.5rem;"></i>
+                    <div class="fw-bold">Satış Raporu</div>
+                    <small>Satışları depo/cari ile göster</small>
+                </button>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-info w-100 py-3 rounded-3" onclick="showProductReport()">
+                    <i class="bi bi-box me-2" style="font-size: 1.5rem;"></i>
+                    <div class="fw-bold">Ürün Raporu</div>
+                    <small>Ürüne ait satışları göster</small>
+                </button>
+            </div>
+        </div>
+
+        <!-- DEPO RAPORU -->
+        <div id="warehouseReportSection" class="card content-card d-none">
+            <div class="card-body">
+                <h5 class="section-title mb-3">Depo Raporu</h5>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Depo Seçiniz</label>
+                    <select id="warehouseSelect" class="form-select" onchange="loadWarehouseReport()">
+                        <option value="">Depo Seçiniz</option>
+                    </select>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Ürün Adı</th>
+                                <th>Stok</th>
+                                <th>Kayıt Tarihi</th>
+                                <th class="text-end">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="warehouseReportBody">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Depo seçiniz</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-outline-primary me-2" onclick="exportWarehouseReportExcel()">
+                    <i class="bi bi-file-earmark-excel me-2"></i>Excel İndir
+                </button>
+                <button class="btn btn-outline-danger" onclick="exportWarehouseReportPDF()">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>PDF İndir
+                </button>
+                <button class="btn btn-secondary" onclick="backToReports()">
+                    <i class="bi bi-arrow-left me-2"></i>Geri
+                </button>
+            </div>
+        </div>
+
+        <!-- SATIŞ RAPORU -->
+        <div id="salesReportSection" class="card content-card d-none">
+            <div class="card-body">
+                <h5 class="section-title mb-3">Satış Raporu</h5>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-primary w-100 mb-2" id="filterByWarehouse" onclick="toggleSalesFilter('warehouse')">
+                            <i class="bi bi-buildings me-2"></i>Depoya Göre
+                        </button>
+                        <div id="warehouseFilterDiv" class="d-none">
+                            <select id="salesWarehouseSelect" class="form-select" onchange="loadSalesReport()">
+                                <option value="">Depo Seçiniz</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-success w-100 mb-2" id="filterByCari" onclick="toggleSalesFilter('cari')">
+                            <i class="bi bi-people me-2"></i>Cariye Göre
+                        </button>
+                        <div id="cariFilterDiv" class="d-none">
+                            <select id="salesCariSelect" class="form-select" onchange="loadSalesReport()">
+                                <option value="">Cari Seçiniz</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Cari</th>
+                                <th>Depo</th>
+                                <th>Ürün</th>
+                                <th>Adet</th>
+                                <th>Alış Fiyatı</th>
+                                <th>Birim Fiyat</th>
+                                <th>Toplam</th>
+                                <th>Kar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesReportBody">
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-4">Filtre seçiniz</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-outline-primary me-2" onclick="exportSalesReportExcel()">
+                    <i class="bi bi-file-earmark-excel me-2"></i>Excel İndir
+                </button>
+                <button class="btn btn-outline-danger" onclick="exportSalesReportPDF()">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>PDF İndir
+                </button>
+                <button class="btn btn-secondary" onclick="backToReports()">
+                    <i class="bi bi-arrow-left me-2"></i>Geri
+                </button>
+            </div>
+        </div>
+
+        <!-- ÜRÜN RAPORU -->
+        <div id="productReportSection" class="card content-card d-none">
+            <div class="card-body">
+                <h5 class="section-title mb-3">Ürün Raporu</h5>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Ürün Seçiniz</label>
+                    <select id="productSelect" class="form-select" onchange="loadProductReport()">
+                        <option value="">Ürün Seçiniz</option>
+                    </select>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Cari</th>
+                                <th>Depo</th>
+                                <th>Adet</th>
+                                <th>Alış Fiyatı</th>
+                                <th>Birim Fiyat</th>
+                                <th>Toplam</th>
+                                <th>Kar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productReportBody">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">Ürün seçiniz</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-outline-primary me-2" onclick="exportProductReportExcel()">
+                    <i class="bi bi-file-earmark-excel me-2"></i>Excel İndir
+                </button>
+                <button class="btn btn-outline-danger" onclick="exportProductReportPDF()">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>PDF İndir
+                </button>
+                <button class="btn btn-secondary" onclick="backToReports()">
+                    <i class="bi bi-arrow-left me-2"></i>Geri
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="./js/common.js"></script>
+    <script src="./js/reports.js"></script>
+
+</body>
+</html>

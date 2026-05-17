@@ -109,7 +109,13 @@ async function loadStocks() {
 
         data.forEach((stock) => {
             const createdAt = stock.created_at
-                ? new Date(stock.created_at).toLocaleString("tr-TR")
+                ? new Date(stock.created_at).toLocaleString("tr-TR", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                })
                 : "-";
 
             stocksTableBody.innerHTML += `
@@ -121,12 +127,16 @@ async function loadStocks() {
                     <td class="text-end">
                         <button 
                             class="btn btn-sm btn-outline-primary rounded-pill me-2"
+                            data-bs-toggle="tooltip"
+                            title="Düzenle"
                             onclick="editStock(${stock.id})">
                             <i class="bi bi-pencil"></i>
                         </button>
 
                         <button 
                             class="btn btn-sm btn-outline-danger rounded-pill"
+                            data-bs-toggle="tooltip"
+                            title="Sil"
                             onclick="deleteStock(${stock.id})">
                             <i class="bi bi-trash"></i>
                         </button>
