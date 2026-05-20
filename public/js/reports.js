@@ -273,28 +273,76 @@ async function loadProductReport() {
 // EXCEL & PDF EXPORT
 // =====================
 
+function downloadCsv(filename, rows) {
+    if (!Array.isArray(rows) || rows.length === 0) return false;
+
+    const header = Object.keys(rows[0]);
+    const csvRows = [header.join(',')];
+
+    rows.forEach(row => {
+        const values = header.map(key => {
+            const value = row[key] == null ? '' : String(row[key]);
+            return `"${value.replace(/"/g, '""')}"`;
+        });
+        csvRows.push(values.join(','));
+    });
+
+    const csvContent = '\uFEFF' + csvRows.join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+    return true;
+}
+
+function exportWorkbook(filename, sheetName, data) {
+    if (!Array.isArray(data) || data.length === 0) {
+        if (typeof showToast === 'function') showToast('İndirilecek veri bulunamadı', 'warning');
+        return;
+    }
+
+    if (typeof XLSX !== 'undefined') {
+        const sheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, sheet, sheetName);
+        XLSX.writeFile(workbook, filename);
+        return;
+    }
+
+    const csvFilename = filename.replace(/\.xlsx$/i, '.csv');
+    if (!downloadCsv(csvFilename, data)) {
+        if (typeof showToast === 'function') showToast('Excel dosyası oluşturulamadı', 'error');
+    }
+}
+
 function exportWarehouseReportExcel() {
-    const warehouseName = document.getElementById("warehouseSelect").selectedOptions[0].text;
+    if (!currentWarehouseReport.length) {
+        if (typeof showToast === 'function') showToast('Lütfen önce depo raporunu yükleyin', 'warning');
+        return;
+    }
+
+    const warehouseName = document.getElementById('warehouseSelect').selectedOptions[0]?.text || 'Depo';
     const data = currentWarehouseReport.map(p => ({
         'Ürün Adı': p.name,
         'Stok': p.stock,
         'Kayıt Tarihi': formatReportDate(p.created_at)
     }));
 
-    const sheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, sheet, "Depo Raporu");
-    XLSX.writeFile(workbook, `Depo_${warehouseName}_${new Date().toLocaleDateString('tr-TR')}.xlsx`);
+    exportWorkbook(`Depo_${warehouseName}_${new Date().toLocaleDateString('tr-TR')}.xlsx`, 'Depo Raporu', data);
 }
 
 function exportWarehouseReportPDF() {
-    const warehouseName = document.getElementById("warehouseSelect").selectedOptions[0].text;
-    const table = document.querySelector("#warehouseReportBody").parentElement.parentElement;
-    const element = document.createElement("div");
+    const warehouseName = document.getElementById('warehouseSelect').selectedOptions[0]?.text || 'Depo';
+    const table = document.querySelector('#warehouseReportBody').closest('table');
+    const element = document.createElement('div');
     element.innerHTML = `
         <h2>Depo Raporu - ${warehouseName}</h2>
         <p>Tarih: ${new Date().toLocaleDateString('tr-TR')}</p>
-        ${table.outerHTML}
+        ${table?.outerHTML || ''}
     `;
 
     const opt = {
@@ -309,46 +357,53 @@ function exportWarehouseReportPDF() {
 }
 
 function exportSalesReportExcel() {
-    const filterName = salesFilterType === 'warehouse' 
-        ? document.getElementById("salesWarehouseSelect").selectedOptions[0].text
-        : document.getElementById("salesCariSelect").selectedOptions[0].text;
+    if (!salesFilterType) {
+        if (typeof showToast === 'function') showToast('Lütfen önce satış filtresi seçin', 'warning');
+        return;
+    }
+
+    const filterName = salesFilterType === 'warehouse'
+        ? document.getElementById('salesWarehouseSelect').selectedOptions[0]?.text || 'Depo'
+        : document.getElementById('salesCariSelect').selectedOptions[0]?.text || 'Cari';
 
     const data = [];
-    const table = document.querySelector("#salesReportBody");
-    table.querySelectorAll("tr").forEach(row => {
-        const cols = row.querySelectorAll("td");
-        if (cols.length > 0) {
+    const table = document.querySelector('#salesReportBody');
+    table.querySelectorAll('tr').forEach(row => {
+        const cols = row.querySelectorAll('td');
+        if (cols.length === 9) {
             data.push({
-                'Tarih': cols[0].textContent,
-                'Cari': cols[1].textContent,
-                'Depo': cols[2].textContent,
-                'Ürün': cols[3].textContent,
-                'Adet': cols[4].textContent,
-                'Alış Fiyatı': cols[5].textContent,
-                'Birim Fiyat': cols[6].textContent,
-                'Toplam': cols[7].textContent,
-                'Kar': cols[8].textContent
+                'Tarih': cols[0].textContent.trim(),
+                'Cari': cols[1].textContent.trim(),
+                'Depo': cols[2].textContent.trim(),
+                'Ürün': cols[3].textContent.trim(),
+                'Adet': cols[4].textContent.trim(),
+                'Alış Fiyatı': cols[5].textContent.trim(),
+                'Birim Fiyat': cols[6].textContent.trim(),
+                'Toplam': cols[7].textContent.trim(),
+                'Kar': cols[8].textContent.trim()
             });
         }
     });
 
-    const sheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, sheet, "Satış Raporu");
-    XLSX.writeFile(workbook, `Satış_${filterName}_${new Date().toLocaleDateString('tr-TR')}.xlsx`);
+    if (!data.length) {
+        showToast?.('Satış raporu görüntülenmeden önce Excel indirme yapılamaz', 'warning');
+        return;
+    }
+
+    exportWorkbook(`Satış_${filterName}_${new Date().toLocaleDateString('tr-TR')}.xlsx`, 'Satış Raporu', data);
 }
 
 function exportSalesReportPDF() {
-    const filterName = salesFilterType === 'warehouse' 
-        ? document.getElementById("salesWarehouseSelect").selectedOptions[0].text
-        : document.getElementById("salesCariSelect").selectedOptions[0].text;
+    const filterName = salesFilterType === 'warehouse'
+        ? document.getElementById('salesWarehouseSelect').selectedOptions[0]?.text || 'Depo'
+        : document.getElementById('salesCariSelect').selectedOptions[0]?.text || 'Cari';
 
-    const table = document.querySelector("#salesReportBody").parentElement.parentElement;
-    const element = document.createElement("div");
+    const table = document.querySelector('#salesReportBody').closest('table');
+    const element = document.createElement('div');
     element.innerHTML = `
         <h2>Satış Raporu - ${filterName}</h2>
         <p>Tarih: ${new Date().toLocaleDateString('tr-TR')}</p>
-        ${table.outerHTML}
+        ${table?.outerHTML || ''}
     `;
 
     const opt = {
@@ -363,40 +418,41 @@ function exportSalesReportPDF() {
 }
 
 function exportProductReportExcel() {
-    const productName = document.getElementById("productSelect").selectedOptions[0].text;
-    
+    const productName = document.getElementById('productSelect').selectedOptions[0]?.text || 'Ürün';
     const data = [];
-    const table = document.querySelector("#productReportBody");
-    table.querySelectorAll("tr").forEach(row => {
-        const cols = row.querySelectorAll("td");
-        if (cols.length > 0) {
+    const table = document.querySelector('#productReportBody');
+    table.querySelectorAll('tr').forEach(row => {
+        const cols = row.querySelectorAll('td');
+        if (cols.length === 8) {
             data.push({
-                'Tarih': cols[0].textContent,
-                'Cari': cols[1].textContent,
-                'Depo': cols[2].textContent,
-                'Adet': cols[3].textContent,
-                'Alış Fiyatı': cols[4].textContent,
-                'Birim Fiyat': cols[5].textContent,
-                'Toplam': cols[6].textContent,
-                'Kar': cols[7].textContent
+                'Tarih': cols[0].textContent.trim(),
+                'Cari': cols[1].textContent.trim(),
+                'Depo': cols[2].textContent.trim(),
+                'Adet': cols[3].textContent.trim(),
+                'Alış Fiyatı': cols[4].textContent.trim(),
+                'Birim Fiyat': cols[5].textContent.trim(),
+                'Toplam': cols[6].textContent.trim(),
+                'Kar': cols[7].textContent.trim()
             });
         }
     });
 
-    const sheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, sheet, "Ürün Raporu");
-    XLSX.writeFile(workbook, `Ürün_${productName}_${new Date().toLocaleDateString('tr-TR')}.xlsx`);
+    if (!data.length) {
+        showToast?.('Ürün raporu görüntülenmeden önce Excel indirme yapılamaz', 'warning');
+        return;
+    }
+
+    exportWorkbook(`Ürün_${productName}_${new Date().toLocaleDateString('tr-TR')}.xlsx`, 'Ürün Raporu', data);
 }
 
 function exportProductReportPDF() {
-    const productName = document.getElementById("productSelect").selectedOptions[0].text;
-    const table = document.querySelector("#productReportBody").parentElement.parentElement;
-    const element = document.createElement("div");
+    const productName = document.getElementById('productSelect').selectedOptions[0]?.text || 'Ürün';
+    const table = document.querySelector('#productReportBody').closest('table');
+    const element = document.createElement('div');
     element.innerHTML = `
         <h2>Ürün Raporu - ${productName}</h2>
         <p>Tarih: ${new Date().toLocaleDateString('tr-TR')}</p>
-        ${table.outerHTML}
+        ${table?.outerHTML || ''}
     `;
 
     const opt = {
