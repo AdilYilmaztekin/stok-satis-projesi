@@ -36,6 +36,7 @@ function showWarehouseReport() {
     document.getElementById("warehouseReportSection").classList.remove("d-none");
     document.getElementById("salesReportSection").classList.add("d-none");
     document.getElementById("productReportSection").classList.add("d-none");
+    updateReportCards();
 }
 
 function showSalesReport() {
@@ -43,6 +44,8 @@ function showSalesReport() {
     document.getElementById("warehouseReportSection").classList.add("d-none");
     document.getElementById("salesReportSection").classList.remove("d-none");
     document.getElementById("productReportSection").classList.add("d-none");
+    updateSalesFilterButtons();
+    updateReportCards();
 }
 
 function showProductReport() {
@@ -50,6 +53,7 @@ function showProductReport() {
     document.getElementById("warehouseReportSection").classList.add("d-none");
     document.getElementById("salesReportSection").classList.add("d-none");
     document.getElementById("productReportSection").classList.remove("d-none");
+    updateReportCards();
 }
 
 function backToReports() {
@@ -57,6 +61,29 @@ function backToReports() {
     document.getElementById("warehouseReportSection").classList.add("d-none");
     document.getElementById("salesReportSection").classList.add("d-none");
     document.getElementById("productReportSection").classList.add("d-none");
+    salesFilterType = null;
+    updateSalesFilterButtons();
+    updateReportCards();
+}
+
+function updateSalesFilterButtons() {
+    const warehouseBtn = document.getElementById("filterByWarehouse");
+    const cariBtn = document.getElementById("filterByCari");
+    if (!warehouseBtn || !cariBtn) return;
+
+    warehouseBtn.classList.toggle("active", salesFilterType === 'warehouse');
+    cariBtn.classList.toggle("active", salesFilterType === 'cari');
+}
+
+function updateReportCards() {
+    const warehouseCard = document.getElementById("warehouseReportCard");
+    const salesCard = document.getElementById("salesReportCard");
+    const productCard = document.getElementById("productReportCard");
+    if (!warehouseCard || !salesCard || !productCard) return;
+
+    warehouseCard.classList.toggle("active", currentReportType === 'warehouse');
+    salesCard.classList.toggle("active", currentReportType === 'sales');
+    productCard.classList.toggle("active", currentReportType === 'product');
 }
 
 // =====================
@@ -114,24 +141,40 @@ async function loadWarehouseReport() {
 let salesFilterType = null;
 
 function toggleSalesFilter(type) {
+    const warehouseDiv = document.getElementById("warehouseFilterDiv");
+    const cariDiv = document.getElementById("cariFilterDiv");
+    const reportBody = document.getElementById("salesReportBody");
+
     if (salesFilterType === type) {
         // Aynı butona tıklandı, kapat
         salesFilterType = null;
-        document.getElementById("warehouseFilterDiv").classList.add("d-none");
-        document.getElementById("cariFilterDiv").classList.add("d-none");
-        document.getElementById("salesReportBody").innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Filtre seçiniz</td></tr>';
+        warehouseDiv.classList.add("d-none");
+        cariDiv.classList.add("d-none");
+        reportBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Filtre seçiniz</td></tr>';
     } else {
         // Yeni filtre tipi seçildi
         salesFilterType = type;
         if (type === 'warehouse') {
-            document.getElementById("warehouseFilterDiv").classList.remove("d-none");
-            document.getElementById("cariFilterDiv").classList.add("d-none");
+            warehouseDiv.classList.remove("d-none");
+            cariDiv.classList.add("d-none");
+            const warehouseId = document.getElementById("salesWarehouseSelect").value;
+            if (warehouseId) {
+                loadSalesReport();
+            } else {
+                reportBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Depo seçiniz</td></tr>';
+            }
         } else {
-            document.getElementById("warehouseFilterDiv").classList.add("d-none");
-            document.getElementById("cariFilterDiv").classList.remove("d-none");
+            warehouseDiv.classList.add("d-none");
+            cariDiv.classList.remove("d-none");
+            const cariId = document.getElementById("salesCariSelect").value;
+            if (cariId) {
+                loadSalesReport();
+            } else {
+                reportBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Cari seçiniz</td></tr>';
+            }
         }
-        document.getElementById("salesReportBody").innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Filtre seçiniz</td></tr>';
     }
+    updateSalesFilterButtons();
 }
 
 async function loadSalesWarehouseSelectOptions() {
