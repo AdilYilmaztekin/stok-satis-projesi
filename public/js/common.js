@@ -32,9 +32,6 @@ function setupNavbar() {
             <a href="reports.html" class="nav-link ${currentPage === 'reports.html' ? 'active' : ''}">
                 <i class="bi bi-bar-chart-line"></i> Raporlar
             </a>
-            <a href="#" class="nav-link">
-                <i class="bi bi-gear"></i> Ayarlar
-            </a>
         </nav>
     `;
 
