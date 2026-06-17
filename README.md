@@ -1,6 +1,10 @@
 # StokBurada - Stok & Satış Yönetim Sistemi v1.0
 # Stock & Sales Management System v1.0
 
+## 🚀 Proje Özeti
+StokBurada; ürün, stok, depo ve satış yönetimini sağlayan web tabanlı bir ERP sistemidir.
+
+
 [![Live](https://img.shields.io/badge/status-live-green.svg)](https://stokburada.com.tr)
 [![GitHub](https://img.shields.io/badge/GitHub-AdilYilmaztekin-blue?logo=github)](https://github.com/AdilYilmaztekin/stok-satis-projesi)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
