@@ -8,6 +8,7 @@ StokBurada; işletmelerin ürün, stok, depo ve satış süreçlerini tek bir pl
 ## Bilgilerim
 Ad-Soyad: Adil Yılmaztekin
 Öğrenci Numarası: 23010502032
+ **GitHub** | [@AdilYilmaztekin](https://github.com/AdilYilmaztekin)
 
 
 [![Live](https://img.shields.io/badge/status-live-green.svg)](https://stokburada.com.tr)
