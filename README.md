@@ -375,27 +375,6 @@ curl -X POST http://localhost:5000/api/sales \
 
 ---
 
-## 🔒 Güvenlik Özellikleri
-
-### Uygulamada Alınan Güvenlik Tedbirleri
-
-✅ **Şifre Güvenliği**
-- Güvenli şifre haşlama
-- Session-based authentication
-
-✅ **Veri Koruması**
-- CORS middleware ile saldırı önleme
-- Input validation
-
-✅ **Veritabanı Güvenliği**
-- Parametrize sorgular (SQL Injection koruması)
-- Connection pooling
-
-✅ **Access Control**
-- Rol tabanlı yetki sistemi
-- Session timeout
-
----
 
 ## 🚀 Geliştirme Planı
 
