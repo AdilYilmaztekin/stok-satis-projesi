@@ -2,7 +2,12 @@
 # Stock & Sales Management System v1.0
 
 ## 🚀 Proje Özeti
-StokBurada; ürün, stok, depo ve satış yönetimini sağlayan web tabanlı bir ERP sistemidir.
+StokBurada; işletmelerin ürün, stok, depo ve satış süreçlerini tek bir platform üzerinden yönetebilmesini sağlayan web tabanlı bir stok ve satış yönetim sistemi geliştirmek amacıyla hazırlanmıştır.
+
+
+## Bilgilerim
+Ad-Soyad: Adil Yılmaztekin
+Öğrenci Numarası: 23010502032
 
 
 [![Live](https://img.shields.io/badge/status-live-green.svg)](https://stokburada.com.tr)
@@ -63,6 +68,41 @@ Etkili ve kullanıcı dostu stok yönetimi ve satış takibi için kapsamlı web
 - ✅ Rol tabanlı erişim kontrolü (RBAC)
 - ✅ İşlem loglaması
 - ✅ Veritabanı güvenliği
+
+---
+
+
+---
+
+# 📸 Ekran Görüntüleri
+
+## 🔐 Giriş Sayfası
+
+![Giriş Sayfası](images/login.png)
+
+---
+
+## 📊 Dashboard
+
+![Dashboard](images/dashboard.png)
+
+---
+
+## 📦 Ürün Yönetimi
+
+![Ürünler](images/products.png)
+
+---
+
+## 💰 Satış Yönetimi
+
+![Satışlar](images/sales.png)
+
+---
+
+## 📈 Raporlar
+
+![Raporlar](images/reports.png)
 
 ---
 

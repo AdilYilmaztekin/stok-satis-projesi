@@ -512,7 +512,6 @@ body {
     #saleModal .row:last-of-type > div {
         margin-bottom: 15px;
     }
-
     #saleItemsBody input, 
     #saleItemsBody select {
         min-width: 130px !important;
