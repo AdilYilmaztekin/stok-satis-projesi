@@ -272,7 +272,7 @@ Sunucu başarıyla çalıştığında göreceksiniz:
 
 Tarayıcınızı açıp aşağıdaki adrese gidin:
 ```
-http://localhost:5000
+http://localhost:3000
 ```
 
 ### Demo Hesapları
