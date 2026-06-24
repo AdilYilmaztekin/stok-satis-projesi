@@ -220,18 +220,13 @@ cp .env.example .env
 
 ```env
 # Server
-PORT=5000
-HOST=localhost
+PORT=3000
 
-# Database
-DB_HOST=localhost
+DB_HOST=turntable.proxy.rlwy.net
+DB_PORT=23892
 DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=stok_satis_db
-DB_PORT=3306
-
-# Application
-NODE_ENV=development
+DB_PASSWORD=BTsHhFRZJKBFcByGsskIQKBROueaEwOt
+DB_NAME=railway
 ```
 
 ### 4️⃣ Veritabanını Oluşturun
@@ -260,7 +255,7 @@ npm start
 
 Sunucu başarıyla çalıştığında göreceksiniz:
 ```
-✓ Server http://localhost:5000 adresinde çalışıyor
+✓ Server http://localhost:3000 adresinde çalışıyor
 ✓ Veritabanı bağlantısı başarılı
 ```
 
@@ -335,7 +330,7 @@ DELETE /api/caris/:id         # Cari sil
 
 ```bash
 # Ürün ekleme
-curl -X POST http://localhost:5000/api/products \
+curl -X POST http://localhost:3000/api/products \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Ürün Adı",
@@ -345,7 +340,7 @@ curl -X POST http://localhost:5000/api/products \
   }'
 
 # Satış kaydı
-curl -X POST http://localhost:5000/api/sales \
+curl -X POST http://localhost:3000/api/sales \
   -H "Content-Type: application/json" \
   -d '{
     "product_id": 1,
